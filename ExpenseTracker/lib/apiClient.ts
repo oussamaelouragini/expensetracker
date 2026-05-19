@@ -9,11 +9,8 @@ export const apiClient = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-console.log(`[Axios] API client created with base URL: ${API_CONFIG.BASE_URL}`);
-
 apiClient.interceptors.request.use(
   async (config) => {
-    console.log(`[Axios] ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
     const token = await AsyncStorage.getItem("accessToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -27,10 +24,7 @@ apiClient.interceptors.request.use(
 );
 
 apiClient.interceptors.response.use(
-  (response) => {
-    console.log(`[Axios] ${response.status} ${response.config.url}`);
-    return response;
-  },
+  (response) => response,
   async (error) => {
     if (error.code === "ERR_NETWORK") {
       console.error("[Axios] Network Error - server unreachable:", API_CONFIG.BASE_URL);

@@ -1,10 +1,9 @@
 import { validateSignInForm } from "@/core/utils/validators";
 import { authService } from "@/features/auth/services/authService";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useUser } from "@/providers/UserProvider";
 import { AuthContext } from "@/providers/AuthProvider";
-import { useContext } from "react";
 
 interface FormState {
   email: string;

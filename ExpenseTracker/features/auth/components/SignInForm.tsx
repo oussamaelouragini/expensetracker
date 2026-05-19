@@ -126,6 +126,14 @@ export default function SignInForm() {
           )}
         </View>
 
+        {/* ── General Error ── */}
+        {errors.general && (
+          <View style={styles.generalError}>
+            <Ionicons name="alert-circle" size={16} color="#EF4444" />
+            <Text style={styles.generalErrorText}>{errors.general}</Text>
+          </View>
+        )}
+
         {/* ── Sign In Button ── */}
         <TouchableOpacity
           style={[styles.ctaButton, isBusy && styles.ctaDisabled]}

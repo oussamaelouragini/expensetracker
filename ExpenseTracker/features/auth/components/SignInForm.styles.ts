@@ -99,6 +99,23 @@ export const styles = StyleSheet.create({
     color: "#EF4444",
   },
 
+  // ── General Error ──────────────────────
+  generalError: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FEF2F2",
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 16,
+    gap: 8,
+  },
+  generalErrorText: {
+    flex: 1,
+    fontSize: 13,
+    color: "#EF4444",
+    fontWeight: "600",
+  },
+
   // ── CTA Button ─────────────────────────
   ctaButton: {
     backgroundColor: "#3B5BDB",

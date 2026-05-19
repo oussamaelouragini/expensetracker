@@ -155,12 +155,9 @@ export default function HomeScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      console.log('[HomeScreen] Focus — fetching transactions for user:', user.id, user.email);
       fetchTransactions();
-    }, [fetchTransactions, user.id, user.email])
+    }, [fetchTransactions])
   );
-
-  console.log('[HomeScreen] Render — balance:', balance, 'user:', user.id, 'loading:', isLoading);
 
   return (
     <ScreenWrapper backgroundColor="#ECEEF5" edges={["top", "left", "right"]}>

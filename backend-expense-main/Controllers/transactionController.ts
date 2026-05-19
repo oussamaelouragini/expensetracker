@@ -123,7 +123,7 @@ export const createTransaction = async (req: Request, res: Response) => {
         if (category) {
           finalCategoryId = category._id;
         } else {
-          console.warn(`Category "${categoryId}" not found for user ${userId}`);
+          console.warn(`Category not found: ${categoryId}`);
         }
       }
     }

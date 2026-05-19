@@ -37,7 +37,8 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-app-example
+# backend build
+backend-expense-main/dist/
 
 # generated native folders
 /ios

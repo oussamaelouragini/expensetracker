@@ -108,13 +108,7 @@ export const uploadAvatar = async (req: Request, res: Response): Promise<Respons
       return res.status(400).json({ success: false, message: 'No image file provided' });
     }
 
-    console.log(`${logPrefix} File received:`, {
-      originalname: file.originalname,
-      mimetype: file.mimetype,
-      size: file.size,
-      filename: file.filename,
-      path: file.path,
-    });
+
 
     const userId = req.user?.id;
     const user = await User.findById(userId);
@@ -126,11 +120,9 @@ export const uploadAvatar = async (req: Request, res: Response): Promise<Respons
 
     if (user.avatarUrl) {
       const oldPath = path.join(__dirname, '..', user.avatarUrl);
-      console.log(`${logPrefix} Deleting old avatar: ${oldPath}`);
       try {
         if (fs.existsSync(oldPath)) {
           fs.unlinkSync(oldPath);
-          console.log(`${logPrefix} Old avatar deleted`);
         }
       } catch (delErr) {
         console.warn(`${logPrefix} Failed to delete old avatar:`, delErr);
@@ -142,7 +134,6 @@ export const uploadAvatar = async (req: Request, res: Response): Promise<Respons
     user.markModified('avatarUrl');
     await user.save();
 
-    console.log(`${logPrefix} Avatar saved: ${avatarUrl}`);
     return res.json({
       success: true,
       message: 'Avatar uploaded successfully',

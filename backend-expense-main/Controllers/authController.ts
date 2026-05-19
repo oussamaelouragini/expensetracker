@@ -175,16 +175,12 @@ export const googleSignIn = async (
 ): Promise<Response> => {
   const { idToken, platform } = req.body;
 
-  console.log('[GoogleSignIn] ====== START ======');
-  console.log('[GoogleSignIn] Request body:', JSON.stringify(req.body));
-  console.log('[GoogleSignIn] Platform:', platform);
 
   // ── 1. Validate request body ──────────────────────────────────────────────
   if (!idToken) {
     console.warn('[GoogleSignIn] Missing idToken in request body');
     return res.status(400).json({ message: 'ID token is required' });
   }
-  console.log('[GoogleSignIn] idToken received (first 50 chars):', idToken.substring(0, 50) + '...');
 
   // ── 2. Verify JWT secrets are configured ──────────────────────────────────
   if (!process.env.ACCESS_OTP_SECRET) {
@@ -195,7 +191,6 @@ export const googleSignIn = async (
     console.error('[GoogleSignIn] REFRESH_OTP_SECRET is not set in .env');
     return res.status(500).json({ message: 'Server configuration error: missing refresh secret' });
   }
-  console.log('[GoogleSignIn] JWT secrets: OK');
 
   try {
     // ── 3. Get Google OAuth client ──────────────────────────────────────────
@@ -204,7 +199,6 @@ export const googleSignIn = async (
       console.error('[GoogleSignIn] Google OAuth client not configured — GOOGLE_CLIENT_ID missing from .env');
       return res.status(500).json({ message: 'Google OAuth not configured on server' });
     }
-    console.log('[GoogleSignIn] OAuth2Client created');
 
     // ── 4. Verify the ID token ──────────────────────────────────────────────
     const audiences = [
@@ -213,18 +207,14 @@ export const googleSignIn = async (
       process.env.GOOGLE_CLIENT_ID,
     ].filter(Boolean) as string[];
 
-    console.log('[GoogleSignIn] verifyIdToken audiences:', JSON.stringify(audiences));
-    console.log('[GoogleSignIn] Calling client.verifyIdToken...');
 
     const ticket = await client.verifyIdToken({
       idToken,
       audience: audiences,
     });
 
-    console.log('[GoogleSignIn] verifyIdToken succeeded');
 
     const payload = ticket.getPayload();
-    console.log('[GoogleSignIn] Token payload:', JSON.stringify(payload, null, 2));
 
     if (!payload) {
       console.warn('[GoogleSignIn] Token payload is empty/undefined');
@@ -239,19 +229,14 @@ export const googleSignIn = async (
     // ── 5. Extract user info from payload ───────────────────────────────────
     const googleEmail = payload.email!;
     const googleName = String(payload.name || googleEmail.split('@')[0]);
-    console.log('[GoogleSignIn] Extracted — email:', googleEmail, 'name:', googleName);
 
     // ── 6. Look up existing user ────────────────────────────────────────────
-    console.log('[GoogleSignIn] Checking for existing user with email:', googleEmail);
     const existingUser = await User.findOne({ email: googleEmail });
-    console.log('[GoogleSignIn] User lookup result:', existingUser ? `FOUND (id=${existingUser._id})` : 'NOT FOUND');
 
     if (existingUser) {
-      console.log('[GoogleSignIn] Existing user — generating JWT tokens...');
       const id = existingUser._id.toString();
       const accessToken = signAccessToken(id, existingUser.email);
       const refreshToken = signRefreshToken(id, existingUser.email);
-      console.log('[GoogleSignIn] JWT tokens generated — accessToken:', accessToken.substring(0, 30) + '...');
 
       res.cookie('jwt', refreshToken, {
         httpOnly: true,
@@ -259,7 +244,6 @@ export const googleSignIn = async (
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
-      console.log('[GoogleSignIn] ====== SUCCESS (existing user) ======');
       return res.status(200).json({
         token: accessToken,
         refreshToken,
@@ -272,24 +256,19 @@ export const googleSignIn = async (
     }
 
     // ── 7. Create new user ──────────────────────────────────────────────────
-    console.log('[GoogleSignIn] Creating new user...');
     const newUser = await User.create({
       name: googleName,
       email: googleEmail,
       authProvider: 'google',
     });
-    console.log('[GoogleSignIn] New user created — id:', newUser._id, 'email:', newUser.email);
 
     // ── 8. Seed default categories ─────────────────────────────────────────
-    console.log('[GoogleSignIn] Seeding default categories...');
     await seedDefaultCategories(newUser._id.toString());
-    console.log('[GoogleSignIn] Default categories seeded');
 
     // ── 9. Generate JWT tokens for new user ─────────────────────────────────
     const newId = newUser._id.toString();
     const newAccessToken = signAccessToken(newId, newUser.email);
     const newRefreshToken = signRefreshToken(newId, newUser.email);
-    console.log('[GoogleSignIn] JWT tokens generated for new user');
 
     res.cookie('jwt', newRefreshToken, {
       httpOnly: true,
@@ -297,7 +276,6 @@ export const googleSignIn = async (
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    console.log('[GoogleSignIn] ====== SUCCESS (new user) ======');
     return res.status(201).json({
       token: newAccessToken,
       refreshToken: newRefreshToken,
@@ -350,8 +328,6 @@ export const forgotPassword = async (
     foundUser.password = await bcrypt.hash(resetToken.slice(-12), 10);
     await foundUser.save();
 
-    console.log(`[ForgotPassword] Reset token for ${email}: ${resetToken}`);
-    console.log(`[ForgotPassword] In production, this would be emailed to ${email}`);
 
     return res.status(200).json({ message: 'If an account with that email exists, reset instructions have been sent.' });
   } catch (err) {

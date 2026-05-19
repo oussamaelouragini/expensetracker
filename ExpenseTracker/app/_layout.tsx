@@ -27,7 +27,6 @@ function RootLayoutNav() {
       try {
         await SplashScreen.hideAsync();
       } catch (e) {
-        console.warn(e);
       }
     };
     const timer = setTimeout(hideSplash, 1000);

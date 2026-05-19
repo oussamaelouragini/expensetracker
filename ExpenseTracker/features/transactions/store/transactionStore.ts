@@ -120,6 +120,5 @@ export const useTransactionStore = create<TransactionStore>((set, get) => ({
 
   reset: () => {
     set({ transactions: [], balance: 0, isLoading: false, error: null });
-    console.log('[TransactionStore] State reset to defaults');
   },
 }));

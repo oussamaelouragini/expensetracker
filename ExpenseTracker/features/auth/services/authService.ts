@@ -57,7 +57,7 @@ export const authService = {
     platform: string
   ): Promise<StoredUser> => {
     const response = await apiClient.post("/auth/google", { idToken, platform });
-    const { token, refreshToken, user } = response.data;
+    const { token, user } = response.data;
 
     await AsyncStorage.setItem("accessToken", token);
     await AsyncStorage.setItem("userId", user.id);
@@ -74,8 +74,7 @@ export const authService = {
   logout: async (): Promise<void> => {
     try {
       await apiClient.get("/auth/logout", { withCredentials: true });
-    } catch (error) {
-      console.warn("Logout API call failed:", error);
+    } catch {
     } finally {
       await AsyncStorage.removeItem("accessToken");
       await AsyncStorage.removeItem("userId");

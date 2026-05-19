@@ -31,14 +31,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const initializeAuth = async () => {
       try {
         const token = await AsyncStorage.getItem("accessToken");
-        console.log('[Auth] Initializing — token found:', !!token);
         if (token) {
           try {
             const newToken = await authService.refreshToken();
             if (newToken) {
               const storedId = await AsyncStorage.getItem("userId");
-              const storedEmail = await AsyncStorage.getItem("userEmail");
-              console.log('[Auth] Token refreshed — userId:', storedId, 'email:', storedEmail);
               if (storedId) {
                 await updateUser({ id: storedId });
                 await loadProfile();
@@ -47,16 +44,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             } else {
               throw new Error("Token refresh returned null");
             }
-          } catch (error) {
-            console.warn("[Auth] Token refresh failed, clearing session:", error);
+          } catch {
             await AsyncStorage.removeItem("accessToken");
             await AsyncStorage.removeItem("userId");
             resetTransactions();
             setIsSignedIn(false);
           }
         }
-      } catch (e) {
-        console.warn("[Auth] Initialization error:", e);
+      } catch {
       } finally {
         setIsLoading(false);
       }
@@ -71,29 +66,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const inAuthGroup = segments[0] === "auth";
 
     if (!isSignedIn && !inAuthGroup) {
-      console.log('[Auth] Not signed in — redirecting to sign-in');
       router.replace("/auth/sign-in");
     } else if (isSignedIn && inAuthGroup) {
-      console.log('[Auth] Signed in — redirecting to home, fetching transactions');
       fetchTransactions();
       router.replace("/home");
     }
   }, [isSignedIn, segments, isLoading, router, fetchTransactions]);
 
   const signIn = useCallback(() => {
-    const storedId = AsyncStorage.getItem("userId");
-    const storedEmail = AsyncStorage.getItem("userEmail");
-    console.log('[Auth] signIn called — userId:', storedId, 'email:', storedEmail);
     fetchTransactions();
     setIsSignedIn(true);
   }, [fetchTransactions]);
 
   const signOut = useCallback(async () => {
-    console.log('[Auth] signOut called — clearing all state');
     try {
       await authService.logout();
-    } catch (error) {
-      console.warn("[Auth] Logout API error:", error);
+    } catch {
     }
     resetTransactions();
     clearUser();

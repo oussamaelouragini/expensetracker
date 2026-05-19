@@ -86,8 +86,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         avatarUri,
         primaryCurrency: data.primaryCurrency,
       });
-    } catch (err) {
-      console.warn("Failed to load profile:", err);
+    } catch {
     } finally {
       setIsLoading(false);
       setIsHydrated(true);
