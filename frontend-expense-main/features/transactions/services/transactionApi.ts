@@ -60,9 +60,10 @@ const CATEGORY_DEFAULTS: Record<string, { icon: string; iconBgColor: string; ico
 
 const mapBackendToFrontend = (tx: BackendTransaction): Transaction => {
   const categoryObj = tx.categoryId as any;
-  const categoryName = typeof categoryObj === "object" && categoryObj !== null
-    ? (categoryObj.name || "")
-    : "";
+  const isPopulated = typeof categoryObj === "object" && categoryObj !== null;
+  const categoryName = isPopulated ? (categoryObj.name || "") : "";
+  const categoryIcon = isPopulated ? (categoryObj.icon || "") : "";
+  const categoryColor = isPopulated ? (categoryObj.color || "") : "";
 
   const typeKey = tx.type === "expense" ? "expense" : "income";
   const defaults = CATEGORY_DEFAULTS[typeKey];
@@ -71,13 +72,13 @@ const mapBackendToFrontend = (tx: BackendTransaction): Transaction => {
     id: tx._id,
     title: tx.note || (tx.type === "expense" ? "Expense" : "Income"),
     category: categoryName,
-    categoryId: (tx.categoryId as Transaction["categoryId"]) || "other",
+    categoryId: isPopulated ? (categoryObj._id as Transaction["categoryId"]) : (tx.categoryId as Transaction["categoryId"]) || "other",
     time: new Date(tx.date).toLocaleDateString(),
     amount: tx.type === "expense" ? -Math.abs(tx.amount) : Math.abs(tx.amount),
     status: "COMPLETED",
-    icon: defaults.icon,
-    iconBgColor: defaults.iconBgColor,
-    iconColor: defaults.iconColor,
+    icon: categoryIcon || defaults.icon,
+    iconBgColor: categoryColor ? categoryColor + "20" : defaults.iconBgColor,
+    iconColor: categoryColor || defaults.iconColor,
     createdAt: new Date(tx.createdAt).getTime(),
   };
 };

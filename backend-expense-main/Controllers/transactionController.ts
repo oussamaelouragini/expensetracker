@@ -11,7 +11,7 @@ export const getTransactionById = async (req: Request, res: Response): Promise<v
       return;
     }
 
-    const transaction = await Transaction.findOne({ _id: id, userId }).populate("categoryId", "name");
+    const transaction = await Transaction.findOne({ _id: id, userId }).populate("categoryId", "name icon color");
 
     if (!transaction) {
       res.status(404).json({ message: "Transaction not found" });
@@ -59,7 +59,7 @@ export const getTransactions = async (req: Request, res: Response) => {
 
     const [transactions, total] = await Promise.all([
       Transaction.find(filter)
-        .populate("categoryId", "name")
+        .populate("categoryId", "name icon color")
         .sort({ date: -1 })
         .skip(skip)
         .limit(Number(limit)),
@@ -140,7 +140,7 @@ export const createTransaction = async (req: Request, res: Response) => {
 
     const saved = await transaction.save();
 
-    const populated = await Transaction.findById(saved._id).populate("categoryId", "name");
+    const populated = await Transaction.findById(saved._id).populate("categoryId", "name icon color");
 
     res.status(201).json({
       message: "Transaction created",
