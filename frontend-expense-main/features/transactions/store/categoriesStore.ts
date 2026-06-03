@@ -54,7 +54,7 @@ export const useCategoriesStore = create<CategoriesStore>((set, get) => ({
         iconColor: data.color || "#3B5BDB",
       };
       set((state) => ({
-        categories: [...state.categories, newCategory],
+        categories: [newCategory, ...state.categories],
         isLoading: false,
       }));
     } catch (error: any) {

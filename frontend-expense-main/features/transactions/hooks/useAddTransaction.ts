@@ -2,7 +2,8 @@
 // Logic & State only
 
 import { useRouter } from "expo-router";
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { useTransactionStore } from "../store/transactionStore";
 import { useCategoriesStore } from "../store/categoriesStore";
 import type {
@@ -41,9 +42,11 @@ export function useAddTransaction() {
   const [amountStr, setAmountStr] = useState("0");
   const [selectedCat, setSelectedCat] = useState<CategoryId>("");
 
-  useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchCategories();
+    }, [fetchCategories])
+  );
 
   useEffect(() => {
     if (categories.length > 0 && !selectedCat) {
