@@ -44,6 +44,9 @@ export function useAddTransaction() {
 
   useFocusEffect(
     useCallback(() => {
+      setAmountStr("0");
+      setSelectedCat("");
+      setType("Expense");
       fetchCategories();
     }, [fetchCategories])
   );
@@ -58,31 +61,24 @@ export function useAddTransaction() {
 
   const handleChangeText = (text: string) => {
     const cleaned = text.replace(/[^0-9.]/g, "");
-    if (cleaned === "") {
+    if (cleaned === "" || cleaned === "0") {
       setAmountStr("0");
       return;
     }
-    const parts = cleaned.split(".");
-    if (parts.length > 2) {
-      setAmountStr(parts[0] + "." + parts.slice(1).join(""));
-      return;
-    }
-    if (parts[1] && parts[1].length > 2) {
-      setAmountStr(parts[0] + "." + parts[1].slice(0, 2));
-      return;
-    }
+    const dotCount = (cleaned.match(/\./g) || []).length;
+    if (dotCount > 1) return;
     setAmountStr(cleaned);
   };
 
   const handleQuickAdd = (item: { categoryLabel: string; label: string; amount: number }) => {
-    setAmountStr(item.amount.toFixed(2));
+    setAmountStr(item.amount.toString());
     const matchedCat = allCategories.find((c) => c.label.toLowerCase() === item.categoryLabel.toLowerCase());
     if (matchedCat) {
       setSelectedCat(matchedCat.id);
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const numericAmount = parseFloat(amountStr);
     if (!numericAmount || numericAmount <= 0) return;
 
@@ -91,7 +87,7 @@ export function useAddTransaction() {
 
     const finalAmount = type === "Expense" ? -numericAmount : numericAmount;
 
-    addTransaction({
+    await addTransaction({
       title: category.label,
       category: category.label,
       categoryId: category.id,
@@ -106,7 +102,7 @@ export function useAddTransaction() {
     router.back();
   };
 
-  const displayAmount = amountStr.includes(".") ? amountStr : `${amountStr}.00`;
+  const displayAmount = amountStr;
 
   return {
     type,

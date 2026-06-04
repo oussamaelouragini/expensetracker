@@ -2,14 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
-  Animated,
   Modal,
   ScrollView,
   StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import * as Haptics from "expo-haptics";
@@ -87,76 +85,25 @@ function AmountInput({
   currencySymbol: string;
 }) {
   const [focused, setFocused] = useState(false);
-  const borderAnim = useRef(new Animated.Value(0)).current;
   const inputRef = useRef<TextInput>(null);
 
-  const [intPart, decPart] = value.includes(".")
-    ? value.split(".")
-    : [value, "00"];
-
-  const handleFocus = () => {
-    setFocused(true);
-    Animated.timing(borderAnim, {
-      toValue: 1,
-      duration: 200,
-      useNativeDriver: false,
-    }).start();
-  };
-
-  const handleBlur = () => {
-    setFocused(false);
-    Animated.timing(borderAnim, {
-      toValue: 0,
-      duration: 200,
-      useNativeDriver: false,
-    }).start();
-  };
-
-  const borderColor = borderAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["#E2E8F0", "#3B5BDB"],
-  });
-
-  const shadowOpacity = borderAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 0.15],
-  });
-
   return (
-    <TouchableWithoutFeedback onPress={() => inputRef.current?.focus()}>
-      <Animated.View
-        style={[
-          styles.amountCard,
-          {
-            borderColor,
-            shadowOpacity,
-          },
-        ]}
-      >
-        <View style={styles.amountInner}>
-          <View style={styles.currencySection}>
-            <Text style={styles.currencySymbol}>{currencySymbol}</Text>
-          </View>
-          <View style={styles.amountDivider} />
-          <View style={styles.amountSection}>
-            <TextInput
-              ref={inputRef}
-              style={styles.amountValue}
-              value={parseInt(intPart).toLocaleString() + "." + decPart.padEnd(2, "0")}
-              onChangeText={onChangeText}
-              keyboardType="decimal-pad"
-              textAlign="left"
-              caretHidden
-              contextMenuHidden
-              selectTextOnFocus={false}
-              maxLength={10}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-            />
-          </View>
-        </View>
-      </Animated.View>
-    </TouchableWithoutFeedback>
+    <View style={styles.amountCard}>
+      <View style={[styles.amountInputWrapper, focused && styles.amountInputFocused]}>
+        <Text style={styles.amountCurrencySign}>{currencySymbol}</Text>
+        <TextInput
+          ref={inputRef}
+          style={styles.amountInput}
+          placeholder="0"
+          placeholderTextColor="#CBD5E1"
+          keyboardType="decimal-pad"
+          value={value === "0" ? "" : value}
+          onChangeText={onChangeText}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+        />
+      </View>
+    </View>
   );
 }
 

@@ -62,53 +62,31 @@ export const styles = StyleSheet.create({
   amountCard: {
     marginHorizontal: 20,
     marginBottom: 24,
-    backgroundColor: "#fff",
-    borderRadius: 22,
-    borderWidth: 2,
-    borderColor: "#E2E8F0",
-    shadowColor: "#000",
-    shadowOpacity: 0,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 2,
   },
-  amountInner: {
+  amountInputWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-  },
-  currencySection: {
-    width: 56,
-    height: 56,
+    backgroundColor: "#fff",
     borderRadius: 16,
-    backgroundColor: "#EEF2FF",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 16,
+    paddingHorizontal: 16,
+    height: 60,
+    borderWidth: 1.5,
+    borderColor: "#E2E8F0",
   },
-  currencySymbol: {
-    fontSize: 24,
-    fontWeight: "800",
-    color: BLUE,
+  amountInputFocused: {
+    borderColor: BLUE,
   },
-  amountDivider: {
-    width: 2,
-    height: 40,
-    backgroundColor: "#E8EDF5",
-    marginRight: 16,
-    borderRadius: 1,
-  },
-  amountSection: {
-    flex: 1,
-    justifyContent: "center",
-  },
-  amountValue: {
-    fontSize: 44,
-    fontWeight: "800",
+  amountCurrencySign: {
+    fontSize: 20,
+    fontWeight: "700",
     color: "#0F172A",
-    letterSpacing: -1.5,
-    lineHeight: 52,
+    marginRight: 8,
+  },
+  amountInput: {
+    flex: 1,
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#0F172A",
   },
 
   sectionRow: {
