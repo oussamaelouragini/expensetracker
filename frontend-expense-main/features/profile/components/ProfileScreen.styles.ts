@@ -30,14 +30,6 @@ export const ps = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  settingsBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
   // ── Avatar Section ────────────────────────────────────────────────────────────
   avatarSection: {
     alignItems: "center",

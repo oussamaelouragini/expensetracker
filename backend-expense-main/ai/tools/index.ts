@@ -13,7 +13,11 @@ export const AI_TOOLS: ChatCompletionTool[] = [
         properties: {
           amount: {
             type: 'number',
-            description: 'Amount spent in TND (Tunisian Dinar)',
+            description: 'Amount spent. Extract the numeric value.',
+          },
+          currency: {
+            type: 'string',
+            description: 'Currency code (TND, USD, EUR). Default is TND. Detect from user input (e.g., "100 TND" → TND, "$50" → USD).',
           },
           categoryName: {
             type: 'string',
@@ -92,7 +96,11 @@ export const AI_TOOLS: ChatCompletionTool[] = [
         properties: {
           amount: {
             type: 'number',
-            description: 'Income amount in TND',
+            description: 'Income amount. Extract the numeric value.',
+          },
+          currency: {
+            type: 'string',
+            description: 'Currency code (TND, USD, EUR). Default is TND. Detect from user input (e.g., "100 TND" → TND, "$50" → USD).',
           },
           categoryName: {
             type: 'string',

@@ -32,28 +32,36 @@ export interface AIResponse {
   };
 }
 
+function formatCurrency(amount: number, currency?: string): string {
+  if (currency === 'USD') return `$${amount}`;
+  if (currency === 'EUR') return `€${amount}`;
+  if (currency === 'GBP') return `£${amount}`;
+  return `${amount} TND`;
+}
+
 function buildConfirmationMessage(toolName: string, args: Record<string, any>, language: string): string {
   const isArabic = language === 'ar' || language === 'ar-TN';
   const isFrench = language === 'fr';
+  const cur = args.currency || 'TND';
 
   if (toolName === 'create_expense') {
     if (isArabic) {
-      return `فهمت التالي:\n• **المبلغ:** ${args.amount} دينار\n• **الفئة:** ${args.categoryName || 'غير محدد'}\n• **الملاحظة:** ${args.note || '-'}\n• **التاريخ:** ${args.date || 'اليوم'}\n\nهل تأكد الإضافة؟`;
+      return `فهمت التالي:\n• **المبلغ:** ${formatCurrency(args.amount, cur)}\n• **الفئة:** ${args.categoryName || 'غير محدد'}\n• **الملاحظة:** ${args.note || '-'}\n• **التاريخ:** ${args.date || 'اليوم'}\n\nهل تأكد الإضافة؟`;
     }
     if (isFrench) {
-      return `J'ai compris:\n• **Montant:** ${args.amount} TND\n• **Catégorie:** ${args.categoryName || 'Non défini'}\n• **Note:** ${args.note || '-'}\n• **Date:** ${args.date || "Aujourd'hui"}\n\nConfirmer l'ajout?`;
+      return `J'ai compris:\n• **Montant:** ${formatCurrency(args.amount, cur)}\n• **Catégorie:** ${args.categoryName || 'Non défini'}\n• **Note:** ${args.note || '-'}\n• **Date:** ${args.date || "Aujourd'hui"}\n\nConfirmer l'ajout?`;
     }
-    return `I understood:\n• **Amount:** ${args.amount} TND\n• **Category:** ${args.categoryName || 'Uncategorized'}\n• **Note:** ${args.note || '-'}\n• **Date:** ${args.date || 'Today'}\n\nShall I add this expense?`;
+    return `I understood:\n• **Amount:** ${formatCurrency(args.amount, cur)}\n• **Category:** ${args.categoryName || 'Uncategorized'}\n• **Note:** ${args.note || '-'}\n• **Date:** ${args.date || 'Today'}\n\nShall I add this expense?`;
   }
 
   if (toolName === 'create_income') {
     if (isArabic) {
-      return `تسجيل دخل:\n• **المبلغ:** ${args.amount} دينار\n• **المصدر:** ${args.categoryName || 'غير محدد'}\n• **التاريخ:** ${args.date || 'اليوم'}\n\nتأكيد؟`;
+      return `تسجيل دخل:\n• **المبلغ:** ${formatCurrency(args.amount, cur)}\n• **المصدر:** ${args.categoryName || 'غير محدد'}\n• **التاريخ:** ${args.date || 'اليوم'}\n\nتأكيد؟`;
     }
     if (isFrench) {
-      return `Enregistrement d'un revenu:\n• **Montant:** ${args.amount} TND\n• **Source:** ${args.categoryName || 'Non défini'}\n• **Date:** ${args.date || "Aujourd'hui"}\n\nConfirmer?`;
+      return `Enregistrement d'un revenu:\n• **Montant:** ${formatCurrency(args.amount, cur)}\n• **Source:** ${args.categoryName || 'Non défini'}\n• **Date:** ${args.date || "Aujourd'hui"}\n\nConfirmer?`;
     }
-    return `Recording income:\n• **Amount:** ${args.amount} TND\n• **Source:** ${args.categoryName || 'Uncategorized'}\n• **Date:** ${args.date || 'Today'}\n\nConfirm?`;
+    return `Recording income:\n• **Amount:** ${formatCurrency(args.amount, cur)}\n• **Source:** ${args.categoryName || 'Uncategorized'}\n• **Date:** ${args.date || 'Today'}\n\nConfirm?`;
   }
 
   if (toolName === 'delete_transaction') {
@@ -308,14 +316,30 @@ export async function executeConfirmedAction(
 
     // Build a success message using Groq to keep language consistency
     const userCtx = await getUserContext(userId);
-    const successContext = `Tool ${toolName} executed successfully. Result: ${JSON.stringify(result.data)}`;
+
+    const tx = result.data?.transaction;
+    const currency = tx?.currency || 'TND';
+    const formattedAmount = currency === 'USD' ? `$${tx?.amount}`
+      : currency === 'EUR' ? `€${tx?.amount}`
+      : currency === 'GBP' ? `£${tx?.amount}`
+      : `${tx?.amount} TND`;
+
+    const successContext = `Tool ${toolName} executed successfully.
+Transaction details:
+- Type: ${tx?.type || 'N/A'}
+- Amount: ${formattedAmount}
+- Category: ${tx?.category || 'N/A'}
+- Note: ${tx?.note || '-'}
+- Date: ${tx?.date || 'N/A'}
+
+The currency used is ${currency}. Always show the amount with the correct currency symbol or code.`;
 
     const summaryResponse = await groq.chat.completions.create({
       model: MODEL,
       messages: [
         {
           role: 'system',
-          content: `You are a financial assistant. Generate a brief, friendly confirmation message in ${userCtx.detectedLanguage} language for this action. Be warm and concise. Use appropriate emoji.`,
+          content: `You are a financial assistant. Generate a brief, friendly confirmation message in ${userCtx.detectedLanguage} language for this action. Be warm and concise. Use appropriate emoji. Always preserve the exact currency shown in the transaction details. For example, if amount is "100 TND" say "100 TND", if "€50" say "€50", if "$100" say "$100".`,
         },
         { role: 'user', content: successContext },
       ],

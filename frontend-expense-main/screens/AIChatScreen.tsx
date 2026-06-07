@@ -1,5 +1,6 @@
-import React, { useRef, useCallback, useState } from 'react';
+import React, { useRef, useCallback, useEffect } from 'react';
 import {
+  AppState,
   View,
   Text,
   StyleSheet,
@@ -27,6 +28,8 @@ const QUICK_ACTIONS = [
   { label: '📈 Insights', message: "Give me spending insights" },
 ];
 
+const INPUT_BAR_HEIGHT = 60;
+
 export default function AIChatScreen() {
   const router = useRouter();
   const {
@@ -41,8 +44,18 @@ export default function AIChatScreen() {
     clearChat,
   } = useAIChat();
 
-  const [inputText, setInputText] = useState('');
+  const [inputText, setInputText] = React.useState('');
+  const [kavKey, setKavKey] = React.useState(0);
   const flatListRef = useRef<FlatList>(null);
+
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "active") {
+        setKavKey((k) => k + 1);
+      }
+    });
+    return () => sub.remove();
+  }, []);
 
   const scrollToBottom = useCallback(() => {
     setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
@@ -131,9 +144,10 @@ export default function AIChatScreen() {
       />
 
       <KeyboardAvoidingView
+        key={kavKey}
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={0}
       >
         {/* Messages */}
         <FlatList
@@ -141,9 +155,10 @@ export default function AIChatScreen() {
           data={messages}
           keyExtractor={(item) => item.id}
           renderItem={renderMessage}
-          contentContainerStyle={styles.messageList}
+          contentContainerStyle={[styles.messageList, { paddingBottom: INPUT_BAR_HEIGHT + 16 }]}
           onContentSizeChange={scrollToBottom}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
           ListFooterComponent={
             isLoading && !hasPendingAction ? (
               <View style={styles.typingIndicator}>

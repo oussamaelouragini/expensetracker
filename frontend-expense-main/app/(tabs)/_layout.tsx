@@ -1,7 +1,10 @@
+import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Tabs } from "expo-router";
 import {
+  AppState,
+  Keyboard,
   Platform,
   useWindowDimensions,
   StyleSheet,
@@ -54,6 +57,28 @@ function CustomTabBar({ state, navigation }: BottomTabBarProps) {
   const safeBottom = Math.max(bottomInset, Platform.OS === "android" ? 16 : 0);
   const barBackground = "#FFFFFF";
   const totalHeight = BAR_H + FAB_RISE + safeBottom;
+
+  const [keyboardVisible, setKeyboardVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    const showSub = Keyboard.addListener("keyboardDidShow", () => setKeyboardVisible(true));
+    const hideSub = Keyboard.addListener("keyboardDidHide", () => setKeyboardVisible(false));
+
+    const appStateSub = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "active") {
+        setKeyboardVisible(false);
+      }
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+      appStateSub.remove();
+    };
+  }, []);
+
+  const currentRoute = state.routes[state.index]?.name;
+  if (keyboardVisible && currentRoute === "ai-chat") return null;
 
   const renderTab = (tab: (typeof LEFT_TABS)[0]) => {
     const idx = state.routes.findIndex((r) => r.name === tab.name);

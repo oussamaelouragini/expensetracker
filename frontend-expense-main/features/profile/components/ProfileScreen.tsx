@@ -276,7 +276,6 @@ export default function ProfileScreen() {
     cyclePreference,
     handleEditProfile,
     handleLogOut,
-    handleSettings,
     handleInfoPress,
   } = useProfile();
 
@@ -292,15 +291,6 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         }
         title="Profile"
-        right={
-          <TouchableOpacity
-            style={ps.settingsBtn}
-            onPress={handleSettings}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="settings-outline" size={22} color={PC.primary} />
-          </TouchableOpacity>
-        }
       />
 
       <ScrollView

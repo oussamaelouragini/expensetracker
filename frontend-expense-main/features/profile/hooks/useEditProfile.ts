@@ -77,7 +77,7 @@ export function useEditProfile() {
       Alert.alert(
         "Profile Updated",
         "Your changes have been saved successfully.",
-        [{ text: "OK", onPress: () => router.back() }],
+        [{ text: "OK", onPress: () => router.push("/(tabs)/profile") }],
       );
     } catch (err: any) {
       const message = err?.response?.data?.message || "Failed to save changes. Please try again.";
@@ -94,11 +94,11 @@ export function useEditProfile() {
         "You have unsaved changes. Are you sure you want to go back?",
         [
           { text: "Stay", style: "cancel" },
-          { text: "Discard", style: "destructive", onPress: () => router.back() },
+          { text: "Discard", style: "destructive", onPress: () => router.push("/(tabs)/profile") },
         ],
       );
     } else {
-      router.back();
+      router.push("/(tabs)/profile");
     }
   }, [dirty, router]);
 

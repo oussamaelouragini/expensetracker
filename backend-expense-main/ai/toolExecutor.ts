@@ -39,7 +39,7 @@ export async function executeTool(
     switch (toolName) {
       // ─── Expense / Income Creation ────────────────────────────────────────
       case 'create_expense': {
-        const { amount, categoryName, note, date, isRecurring } = args;
+        const { amount, categoryName, note, date, isRecurring, currency } = args;
         if (!amount || amount <= 0) return { success: false, error: 'Invalid amount' };
 
         const categoryId = await resolveCategoryId(userId, categoryName);
@@ -63,6 +63,7 @@ export async function executeTool(
             transaction: {
               id: saved._id,
               amount: saved.amount,
+              currency: currency || 'TND',
               category: (populated?.categoryId as any)?.name || categoryName || 'Uncategorized',
               note: saved.note,
               date: saved.date.toISOString().split('T')[0],
@@ -73,7 +74,7 @@ export async function executeTool(
       }
 
       case 'create_income': {
-        const { amount, categoryName, note, date } = args;
+        const { amount, categoryName, note, date, currency } = args;
         if (!amount || amount <= 0) return { success: false, error: 'Invalid amount' };
 
         const categoryId = await resolveCategoryId(userId, categoryName);
@@ -96,6 +97,7 @@ export async function executeTool(
             transaction: {
               id: saved._id,
               amount: saved.amount,
+              currency: currency || 'TND',
               category: (populated?.categoryId as any)?.name || categoryName || 'Uncategorized',
               note: saved.note,
               date: saved.date.toISOString().split('T')[0],

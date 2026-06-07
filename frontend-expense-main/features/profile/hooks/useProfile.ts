@@ -3,7 +3,6 @@
 // ✅ Ready for backend integration (updateUser can call API)
 
 import React, { useContext, useEffect } from "react";
-import { Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { useCurrency } from "@/providers/CurrencyProvider";
 import { useUser } from "@/providers/UserProvider";
@@ -70,7 +69,7 @@ export function useProfile() {
 
   // ── Currency (global) ────────────────────────────────────────────────────
   const { currency, setCurrency } = useCurrency();
-  const currencyCodes: CurrencyCode[] = ["USD", "EUR", "GBP", "TND"];
+  const currencyCodes: CurrencyCode[] = ["TND", "USD", "EUR"];
   const currencyOptions = currencyCodes.map((c) => CURRENCIES[c].label);
 
   // ── App Preferences ───────────────────────────────────────────────────────
@@ -83,15 +82,6 @@ export function useProfile() {
       iconColor: "#3B5BDB",
       value: CURRENCIES[currency].label,
       options: currencyOptions,
-    },
-    {
-      id: "language",
-      label: "App Language",
-      icon: "language-outline",
-      iconBgColor: "#EEF2FF",
-      iconColor: "#3B5BDB",
-      value: "English",
-      options: ["English", "French", "Arabic"],
     },
   ]);
 
@@ -108,15 +98,6 @@ export function useProfile() {
       const currentIdx = currencyCodes.indexOf(currency);
       const next = currencyCodes[(currentIdx + 1) % currencyCodes.length];
       setCurrency(next);
-    } else {
-      setPreferences((prev) =>
-        prev.map((p) => {
-          if (p.id !== id) return p;
-          const idx = p.options.indexOf(p.value);
-          const next = p.options[(idx + 1) % p.options.length];
-          return { ...p, value: next };
-        }),
-      );
     }
   };
 
@@ -127,10 +108,6 @@ export function useProfile() {
 
   const handleLogOut = () => {
     signOut();
-  };
-
-  const handleSettings = () => {
-    Alert.alert("Settings", "Coming soon!");
   };
 
   const handleInfoPress = (id: string) => {
@@ -147,7 +124,6 @@ export function useProfile() {
     cyclePreference,
     handleEditProfile,
     handleLogOut,
-    handleSettings,
     handleInfoPress,
   };
 }

@@ -9,7 +9,7 @@ interface Props {
   isLoading: boolean;
 }
 
-export default function ConfirmationCard({ message, onConfirm, onCancel, isLoading }: Props) {
+export default React.memo(function ConfirmationCard({ message, onConfirm, onCancel, isLoading }: Props) {
   return (
     <View style={styles.card}>
       <View style={styles.header}>
@@ -42,7 +42,7 @@ export default function ConfirmationCard({ message, onConfirm, onCancel, isLoadi
       </View>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   card: {

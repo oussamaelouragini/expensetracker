@@ -21,7 +21,7 @@ import {
 import ScreenWrapper from "@/core/components/ScreenWrapper";
 import Header from "@/core/components/Header";
 import { useCurrency } from "@/providers/CurrencyProvider";
-import { formatShort as fmtShort, formatBalance as fmtBalance } from "@/utils/currency";
+import { CURRENCIES, formatShort as fmtShort, formatBalance as fmtBalance } from "@/utils/currency";
 import { calculateGoalInsights } from "@/utils/goalEstimations";
 import type { GoalInsight } from "@/utils/goalEstimations";
 
@@ -71,11 +71,13 @@ function AddSavingsModal({
   onClose,
   onSave,
   goalName,
+  currency,
 }: {
   visible: boolean;
   onClose: () => void;
   onSave: (amount: number) => Promise<void>;
   goalName: string;
+  currency: string;
 }) {
   const [amountStr, setAmountStr] = useState("");
   const [saving, setSaving] = useState(false);
@@ -120,7 +122,7 @@ function AddSavingsModal({
                 How much have you saved for {"\u201C"}{goalName}{"\u201D"}?
               </Text>
               <View style={[as.inputWrap, focused && as.inputFocused]}>
-                <Text style={as.currencySign}>$</Text>
+                <Text style={as.currencySign}>{CURRENCIES[currency as keyof typeof CURRENCIES]?.symbol || "$"}</Text>
                 <TextInput
                   ref={inputRef}
                   style={as.input}
@@ -481,7 +483,7 @@ export default function AllGoalsScreen() {
 
       <Header
         left={
-          <TouchableOpacity style={s.backBtn} onPress={() => router.push("/(tabs)/home")}>
+          <TouchableOpacity style={s.backBtn} onPress={() => router.push("/(tabs)/goals")}>
             <Ionicons name="arrow-back" size={22} color="#0F172A" />
           </TouchableOpacity>
         }
@@ -553,6 +555,7 @@ export default function AllGoalsScreen() {
         onClose={() => setSavingsTarget(null)}
         onSave={handleAddSavings}
         goalName={savingsTarget?.name || ""}
+        currency={currency}
       />
     </ScreenWrapper>
   );

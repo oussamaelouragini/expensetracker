@@ -11,7 +11,7 @@ function formatTime(date: Date): string {
   return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-export default function MessageBubble({ message }: Props) {
+export default React.memo(function MessageBubble({ message }: Props) {
   const isUser = message.role === 'user';
   const isError = message.type === 'error';
   const isSending = message.status === 'sending';
@@ -59,7 +59,7 @@ export default function MessageBubble({ message }: Props) {
       </View>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   wrapper: {

@@ -51,7 +51,9 @@ export const profileService = {
       } as any);
     }
 
-    const response = await apiClient.post("/users/avatar", formData);
+    const response = await apiClient.post("/users/avatar", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
     return response.data.avatarUrl;
   },
 
